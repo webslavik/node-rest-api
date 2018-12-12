@@ -9,8 +9,14 @@ router.get('/', (request, response, next) => {
 })
 
 router.post('/', (request, response, next) => {
+    const product = {
+        name: request.body.name,
+        price: request.body.price,
+    }
+
     response.status(201).json({
-        message: 'POST request to /products'
+        message: 'POST request to /products',
+        product,
     })
 })
 

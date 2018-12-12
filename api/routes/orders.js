@@ -9,8 +9,11 @@ router.get('/', (request, response, next) => {
 })
 
 router.post('/', (request, response, next) => {
+    const name = request.body.name
+
     response.status(201).json({
         message: 'Add order',
+        name,
     })
 })
 
