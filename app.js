@@ -1,7 +1,19 @@
 const express = require('express')
 const morgan = require('morgan')
+const mongoose = require('mongoose')
 
 const app = express()
+
+// Data Base
+mongoose
+    .connect('mongodb://localhost:27017/restAPI', { useNewUrlParser: true })
+    .then(() => {
+        console.log('Connection to DB is successful.')
+    })
+    .catch((error) => {
+        console.log(`Can't connect to DB: ${error}`)
+    })
+    
 
 // middleware
 app.use(morgan('dev'))
