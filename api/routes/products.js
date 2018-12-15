@@ -7,12 +7,28 @@ const Product = require('./../models/products')
 /**
  * Get all
  */
-router.get('/', async (request, response, next) => {
+router.get('/', async (request, response) => {
     try {
-        const result = await Product.find()
+        const docs = await Product.find().select('-__v')
+
+        const products = docs.map(doc => {
+            return {
+                name: doc.name,
+                price: doc.price,
+                _id: doc._id,
+                request: {
+                    type: 'GET',
+                    url: `http://localhost:3000/products/${doc._id}`
+                }
+            }
+        })
 
         response.status(200).json({
-            result
+            success: true,
+            data: {
+                count: docs.length,
+                products,
+            }
         })
     } catch (error) {
         response.status(500).json({
@@ -24,18 +40,25 @@ router.get('/', async (request, response, next) => {
 /**
  * Add
  */
-router.post('/', async (request, response, next) => {
-    const product = new Product({
-        name: request.body.name,
-        price: request.body.price
-    })
+router.post('/', async (request, response) => {
+    const name = request.body.name
+    const price = request.body.price
 
     try {
-        const result = await product.save()
+        const product = await Product.create({ name, price })
 
         response.status(201).json({
-            message: 'POST request to /products',
-            result,
+            success: true,
+            data: {
+                message: 'Product was created',
+                name: product.name,
+                price: product.price,
+                _id: product._id,
+                request: {
+                    type: 'GET',
+                    url: `http://localhost:3000/products/${product._id}`
+                }
+            }
         })
     } catch (error) {
         response.status(500).json({
@@ -48,14 +71,24 @@ router.post('/', async (request, response, next) => {
 /**
  * Get one
  */
-router.get('/:productId', async (request, response, next) => {
+router.get('/:productId', async (request, response) => {
     const id = request.params.productId
 
     try {
-        const result = await Product.findById(id)
+        const product = await Product.findById(id)
         
         response.status(200).json({
-            result
+            success: true,
+            data: {
+                message: 'Get product',
+                name: product.name,
+                price: product.price,
+                _id: product._id,
+                request: {
+                    type: 'GET',
+                    url: `http://localhost:3000/products/${product._id}`
+                }
+            }
         })
     } catch (error) {
         response.status(500).json({
@@ -67,7 +100,7 @@ router.get('/:productId', async (request, response, next) => {
 /**
  * Update
  */
-router.patch('/:productId', async (request, response, next) => {
+router.patch('/:productId', async (request, response) => {
     const id = request.params.productId
     const options = request.body
     const productOps = {}
@@ -77,13 +110,13 @@ router.patch('/:productId', async (request, response, next) => {
     }
 
     try {
-        const result = await Product.findByIdAndUpdate(id, {
+        const product = await Product.findByIdAndUpdate(id, {
             $set: {
                 ...productOps
             },
         }, { new: true })
 
-        if (!result) {
+        if (!product) {
             return response.status(404).json({
                 success: false,
                 data: {
@@ -93,7 +126,17 @@ router.patch('/:productId', async (request, response, next) => {
         }
 
         response.status(200).json({
-            result
+            success: true,
+            data: {
+                message: 'Product was updated',
+                name: product.name,
+                price: product.price,
+                _id: product._id,
+                request: {
+                    type: 'GET',
+                    url: `http://localhost:3000/products/${product._id}`
+                }
+            }
         })
     } catch (error) {
         response.status(500).json({
@@ -105,14 +148,34 @@ router.patch('/:productId', async (request, response, next) => {
 /**
  * Delete
  */
-router.delete('/:productId', async (request, response, next) => {
+router.delete('/:productId', async (request, response) => {
     const id = request.params.productId
 
     try {
-        const result = await Product.findByIdAndDelete(id)
+        const product = await Product.findByIdAndDelete(id)
+
+        if (!product) {
+            return response.status(404).json({
+                success: false,
+                data: {
+                    message: 'Not found'
+                }
+            })
+        }
 
         response.status(200).json({
-            result
+            success: true,
+            data: {
+                message: 'Product was deleted',
+                request: {
+                    type: 'POST',
+                    url: `http://localhost:3000/products`,
+                    body: {
+                        name: 'String',
+                        price: 'Number'
+                    }
+                }
+            }
         })
     } catch (error) {
         response.status(200).json({
