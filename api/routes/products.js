@@ -1,7 +1,36 @@
 const express = require('express')
-const router = express.Router()
+const multer = require('multer')
 
 const Product = require('./../models/products')
+const router = express.Router()
+
+// Multer settings
+const storage = multer.diskStorage({
+    destination(request, file, callback) {
+        callback(null, './uploads/')
+    },
+    filename(request, file, callback) {
+        callback(null, `${new Date().toISOString()}-${file.originalname}`)
+    }
+})
+
+const fileFilter = (request, file, callback) => {
+    if (file.mimetype === 'image/jpeg' ||
+        file.mimetype === 'image/png') {
+        callback(null, true)
+        return
+    } 
+
+    callback(null, false)
+}
+
+const upload = multer({ 
+    storage,
+    fileFilter,
+    limits: {
+        fileSize: 1024 * 1024 * 5
+    },
+})
 
 
 /**
@@ -13,9 +42,10 @@ router.get('/', async (request, response) => {
 
         const products = docs.map(doc => {
             return {
+                _id: doc._id,
                 name: doc.name,
                 price: doc.price,
-                _id: doc._id,
+                image: doc.image,
                 request: {
                     type: 'GET',
                     url: `http://localhost:3000/products/${doc._id}`
@@ -41,12 +71,14 @@ router.get('/', async (request, response) => {
 /**
  * Add
  */
-router.post('/', async (request, response) => {
+router.post('/', upload.single('productImage'), async (request, response) => {
     const name = request.body.name
     const price = request.body.price
+    const image = request.file.path
+    
 
     try {
-        const product = await Product.create({ name, price })
+        const product = await Product.create({ name, price, image })
 
         response.status(201).json({
             success: true,
@@ -54,6 +86,7 @@ router.post('/', async (request, response) => {
                 message: 'Product was created',
                 name: product.name,
                 price: product.price,
+                image: product.image,
                 _id: product._id,
                 request: {
                     type: 'GET',
@@ -82,12 +115,15 @@ router.get('/:productId', async (request, response) => {
             success: true,
             data: {
                 message: 'Get product',
-                name: product.name,
-                price: product.price,
-                _id: product._id,
-                request: {
-                    type: 'GET',
-                    url: `http://localhost:3000/products/${product._id}`
+                product: {
+                    _id: product._id,
+                    name: product.name,
+                    price: product.price,
+                    image: product.image,
+                    request: {
+                        type: 'GET',
+                        url: `http://localhost:3000/products/${product._id}`
+                    }
                 }
             }
         })
@@ -130,12 +166,15 @@ router.patch('/:productId', async (request, response) => {
             success: true,
             data: {
                 message: 'Product was updated',
-                name: product.name,
-                price: product.price,
-                _id: product._id,
-                request: {
-                    type: 'GET',
-                    url: `http://localhost:3000/products/${product._id}`
+                product: {
+                    _id: product._id,
+                    name: product.name,
+                    price: product.price,
+                    image: product.image,
+                    request: {
+                        type: 'GET',
+                        url: `http://localhost:3000/products/${product._id}`
+                    }
                 }
             }
         })
