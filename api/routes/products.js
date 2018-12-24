@@ -3,6 +3,7 @@ const multer = require('multer')
 
 const Product = require('./../models/products')
 const router = express.Router()
+const Authenticate = require('./../middleware/authenticate')
 
 // Multer settings
 const storage = multer.diskStorage({
@@ -36,7 +37,7 @@ const upload = multer({
 /**
  * Get all
  */
-router.get('/', async (request, response) => {
+router.get('/', Authenticate, async (request, response) => {
     try {
         const docs = await Product.find().select('-__v')
 
@@ -71,11 +72,10 @@ router.get('/', async (request, response) => {
 /**
  * Add
  */
-router.post('/', upload.single('productImage'), async (request, response) => {
+router.post('/', Authenticate, upload.single('productImage'), async (request, response) => {
     const name = request.body.name
     const price = request.body.price
     const image = request.file.path
-    
 
     try {
         const product = await Product.create({ name, price, image })
@@ -105,7 +105,7 @@ router.post('/', upload.single('productImage'), async (request, response) => {
 /**
  * Get one
  */
-router.get('/:productId', async (request, response) => {
+router.get('/:productId', Authenticate, async (request, response) => {
     const id = request.params.productId
 
     try {
@@ -137,7 +137,7 @@ router.get('/:productId', async (request, response) => {
 /**
  * Update
  */
-router.patch('/:productId', async (request, response) => {
+router.patch('/:productId', Authenticate, async (request, response) => {
     const id = request.params.productId
     const options = request.body
     const productOps = {}
@@ -188,7 +188,7 @@ router.patch('/:productId', async (request, response) => {
 /**
  * Delete
  */
-router.delete('/:productId', async (request, response) => {
+router.delete('/:productId', Authenticate, async (request, response) => {
     const id = request.params.productId
 
     try {

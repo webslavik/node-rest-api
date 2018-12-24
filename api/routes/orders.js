@@ -3,12 +3,13 @@ const router = express.Router()
 
 const Orders = require('./../models/orders')
 const Products = require('./../models/products')
+const Authenticate = require('./../middleware/authenticate')
 
 
 /**
  * Get all
  */
-router.get('/', async (request, response) => {
+router.get('/', Authenticate, async (request, response) => {
     try {
         const docs = await Orders.find().select('-__v').populate('product', 'name')
 
@@ -43,7 +44,7 @@ router.get('/', async (request, response) => {
 /**
  * Create
  */
-router.post('/', async (request, response) => {
+router.post('/', Authenticate, async (request, response) => {
     const productId = request.body.productId
     const quantity = request.body.quantity
 
@@ -84,7 +85,7 @@ router.post('/', async (request, response) => {
 /**
  * Get an order
  */
-router.get('/:orderId', async (request, response) => {
+router.get('/:orderId', Authenticate, async (request, response) => {
     const orderId = request.params.orderId
     
     try {
@@ -119,7 +120,7 @@ router.get('/:orderId', async (request, response) => {
     }
 })
 
-router.delete('/:orderId', async (request, response) => {
+router.delete('/:orderId', Authenticate, async (request, response) => {
     const orderId = request.params.orderId
 
     try {
