@@ -10,7 +10,7 @@ const Products = require('./../models/products')
  */
 router.get('/', async (request, response) => {
     try {
-        const docs = await Orders.find().select('-__v')
+        const docs = await Orders.find().select('-__v').populate('product', 'name')
 
         const orders = docs.map(doc => {
             return {
@@ -88,7 +88,7 @@ router.get('/:orderId', async (request, response) => {
     const orderId = request.params.orderId
     
     try {
-        const order = await Orders.findById(orderId)
+        const order = await Orders.findById(orderId).populate('product', '-__v')
         
         if (!order) {
             return response.status(404).json({
