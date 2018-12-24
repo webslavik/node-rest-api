@@ -1,7 +1,7 @@
 const { model, Schema} = require('mongoose')
 
 
-const usersSchema = new Schema({
+const userSchema = new Schema({
     email: {
         type: String,
         required: true,
@@ -14,4 +14,12 @@ const usersSchema = new Schema({
     }
 })
 
-module.exports = model('Users', usersSchema)
+userSchema.pre('save', (next) => {
+    const user = this
+    console.log('Save', product);
+    
+
+    next()
+})
+
+module.exports = model('Users', userSchema)

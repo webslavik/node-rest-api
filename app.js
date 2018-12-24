@@ -38,13 +38,15 @@ app.use((request, response, next) => {
 
 
 // Routes
-const productsRoutes = require('./api/routes/products')
-const ordersRoutes = require('./api/routes/orders')
-const signupRoutes = require('./api/routes/auth/signup')
+const products = require('./api/routes/products')
+const orders = require('./api/routes/orders')
+const signup = require('./api/routes/auth/signup')
+const signin = require('./api/routes/auth/signin')
 
-app.use('/products', productsRoutes)
-app.use('/orders', ordersRoutes)
-app.use('/signup', signupRoutes)
+app.use('/products', products)
+app.use('/orders', orders)
+app.use('/signup', signup)
+app.use('/signin', signin)
 
 
 // Handling errors
