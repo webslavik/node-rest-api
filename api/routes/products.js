@@ -26,6 +26,7 @@ router.get('/', async (request, response) => {
         response.status(200).json({
             success: true,
             data: {
+                message: 'Got all products',
                 count: docs.length,
                 products,
             }
@@ -178,7 +179,7 @@ router.delete('/:productId', async (request, response) => {
             }
         })
     } catch (error) {
-        response.status(200).json({
+        response.status(500).json({
             error
         })
     }
