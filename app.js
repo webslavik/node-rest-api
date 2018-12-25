@@ -42,11 +42,13 @@ const products = require('./api/routes/products')
 const orders = require('./api/routes/orders')
 const signup = require('./api/routes/auth/signup')
 const signin = require('./api/routes/auth/signin')
+const profile = require('./api/routes/profile')
 
 app.use('/products', products)
 app.use('/orders', orders)
 app.use('/signup', signup)
 app.use('/signin', signin)
+app.use('/profile', profile)
 
 
 // Handling errors

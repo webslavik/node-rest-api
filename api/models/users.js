@@ -14,12 +14,12 @@ const userSchema = new Schema({
     }
 })
 
-userSchema.pre('save', (next) => {
-    const user = this
-    console.log('Save', product);
+// userSchema.pre('save', (next) => {
+//     const user = this
+//     console.log('Save', product);
     
 
-    next()
-})
+//     next()
+// })
 
 module.exports = model('Users', userSchema)
